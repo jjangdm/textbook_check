@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>학생 문서 열람</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .container {
+        background-color: #f5f5f5;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      input {
+        width: 100%;
+        padding: 8px;
+        margin: 8px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #result {
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      .success {
+        background-color: #dff0d8;
+        color: #3c763d;
+      }
+      .error {
+        background-color: #f2dede;
+        color: #a94442;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>학생 문서 열람</h1>
+      <div>
+        <label for="studentId">학번:</label>
+        <input type="text" id="studentId" placeholder="학번을 입력하세요" />
+      </div>
+      <div>
+        <label for="password">비밀번호:</label>
+        <input
+          type="password"
+          id="password"
+          placeholder="비밀번호를 입력하세요"
+        />
+      </div>
+      <button onclick="checkAccess()">문서 열람</button>
+      <div id="result"></div>
+    </div>
+
+    <script>
+      // 학생 정보를 저장할 객체
+      const studentData = {
+        // 학번: {hash: '비밀번호의 해시값', link: '구글 드라이브 공유 링크'}
+        12345: {
+          hash: "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", // 'password'의 해시값
+          link: "https://drive.google.com/file/d/YOUR_FILE_ID/view?usp=sharing",
+        },
+        // 여기에 더 많은 학생 데이터를 추가할 수 있습니다
+      };
+
+      function checkAccess() {
+        const studentId = document.getElementById("studentId").value;
+        const password = document.getElementById("password").value;
+        const resultDiv = document.getElementById("result");
+
+        // 입력값 검증
+        if (!studentId || !password) {
+          resultDiv.className = "error";
+          resultDiv.textContent = "학번과 비밀번호를 모두 입력해주세요.";
+          return;
+        }
+
+        // 학번 확인
+        if (!studentData[studentId]) {
+          resultDiv.className = "error";
+          resultDiv.textContent = "잘못된 학번입니다.";
+          return;
+        }
+
+        // 비밀번호 해시 검증
+        const hashedPassword = CryptoJS.SHA256(password).toString();
+        if (hashedPassword === studentData[studentId].hash) {
+          resultDiv.className = "success";
+          resultDiv.innerHTML =
+            '인증되었습니다. <a href="' +
+            studentData[studentId].link +
+            '" target="_blank">여기를 클릭하여 문서를 열람하세요</a>';
+        } else {
+          resultDiv.className = "error";
+          resultDiv.textContent = "비밀번호가 올바르지 않습니다.";
+        }
+      }
+    </script>
+  </body>
+</html>
